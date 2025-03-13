@@ -6,11 +6,16 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git
 # Set the working directory
 WORKDIR /ComfyUI
 
-# Update pip, install GPU dependencies, and install Comfy dependencies
-RUN pip install --upgrade pip && pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121 && pip install -r requirements.txt
+# Update pip, install GPU dependencies, and install ComfyUI dependencies
+RUN pip install --upgrade pip
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
+RUN pip install -r requirements.txt
 
-# Clone ComfyUI-Manager
-RUN git clone https://github.com/ltdrdata/ComfyUI-Manager.git /ComfyUI/custom_nodes/ComfyUI-Manager
+# Install RunPod SDK
+RUN pip install runpod
+
+# Copy the serverless handler script into the container
+COPY rp_handler.py /ComfyUI/
 
 # Set the entry point for the container
-CMD python3 main.py --listen 0.0.0.0 --port ${PORT:-8188}
+CMD ["python3", "-u", "rp_handler.py"]
